@@ -1,0 +1,90 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+int queue[15];
+int front = -1;
+int rear = -1;
+int count = 0;
+int MAX = 15;
+
+void enqueue(int order) {
+    if (count == MAX) {
+        printf("Queue is full. Cannot accept more orders.\n");
+    }
+    else {
+        if (front == -1)
+        {
+            front = 0;
+        }
+        rear++;
+        queue[rear] = order;
+        count++;
+        printf("Order added successfully.\n");
+    }
+}
+
+void dequeue() 
+{
+    if (count == 0)
+    {
+        printf("Queue is empty. No orders to serve.\n");
+    }
+    else {
+        int order = queue[front];
+        front++;
+        count--;
+        if (count == 0) 
+        {
+            front = -1;
+            rear = -1;
+        }
+        printf("Order served: %d\n", order);
+    }
+}
+
+void display() 
+{
+    if (count == 0)
+    {
+        printf("Queue is empty.\n");
+    }
+    else {
+        printf("Current Orders: ");
+        for (int i = front; i <= rear; i++) {
+            printf("%d ", queue[i]);
+        }
+        printf("\n");
+    }
+}
+
+int main() {
+    int choice, order;
+    while (1) {
+        printf("\n1. Place Order");
+        printf("\n2. Serve Order");
+        printf("\n3. Display Order Queue");
+        printf("\n4. Exit");
+        printf("\nEnter choice: ");
+        scanf("%d", &choice);
+
+        switch (choice) {
+            case 1:
+                printf("Enter Order ID: ");
+                scanf("%d", &order);
+                enqueue(order);
+                break;
+            case 2:
+                dequeue();
+                break;
+            case 3:
+                display();
+                break;
+            case 4:
+                printf("\nExiting Order System!");
+                return 0;
+            default:
+                printf("Invalid choice!\n");
+        }
+    }
+    return 0;
+}
