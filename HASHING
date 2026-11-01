@@ -1,0 +1,113 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+int *a;
+int size;
+
+void display()
+{
+    for (int i = 0; i < size; i++)
+        printf("Index [%d] = %d\n", i, a[i]);
+}
+
+void linear()
+{
+    int value, index, start;
+    printf("Enter phone number: ");
+    scanf("%d", &value);
+
+    index = value % size;
+    start = index;
+
+    while (a[index] != -1)
+    {
+        index = (index + 1) % size;
+        if (index == start)
+        {
+            printf("Directory full\n");
+            return;
+        }
+    }
+    a[index] = value;
+    display();
+}
+
+void quadratic()
+{
+    int value, index, i = 0;
+    printf("Enter phone number: ");
+    scanf("%d", &value);
+
+    index = value % size;
+
+    while (a[index] != -1)
+    {
+        index = (value % size + i * i) % size;
+        if (a[index] == -1)
+            break;
+        if (i == size)
+        {
+            printf("Directory full\n");
+            return;
+        }
+        i++;
+    }
+    a[index] = value;
+    display();
+}
+
+void double1()
+{
+    int value, h1, h2, index;
+    printf("Enter phone number: ");
+    scanf("%d", &value);
+
+    h1 = value % size;
+    index = h1;
+    int i=0;
+
+    while (a[index] != -1)
+    {
+        h2 = 7 - (value % 7);
+        index = (h1 + i * h2) % size;
+        if (a[index] == -1)
+            break;
+        if (i == size)
+        {
+            printf("Directory full\n");
+            return;
+        }
+        i++;
+    }
+    a[index] = value;
+    display();
+}
+
+int main()
+{
+    int ch;
+    printf("Enter size of directory: ");
+    scanf("%d", &size);
+
+    a = (int *)malloc(size * sizeof(int));
+    for (int i = 0; i < size; i++)
+        a[i] = -1;
+
+    while (1)
+    {
+        printf("\n1.Linear\n2.Quadratic\n3.Double\n4.Display\n5.Exit\n");
+        printf("Enter choice: ");
+        scanf("%d", &ch);
+
+        switch (ch)
+        {
+            case 1: linear(); break;
+            case 2: quadratic(); break;
+            case 3: double1(); break;
+            case 4: display(); break;
+            case 5: free(a); exit(0);
+            default: printf("Invalid choice\n");
+        }
+    }
+    return 0;
+}
