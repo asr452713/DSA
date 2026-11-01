@@ -1,0 +1,132 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
+
+#define ROWS 10
+#define SEATS 7
+
+struct Seat {
+    int seat_num;
+    int status;
+    struct Seat *prev;
+    struct Seat *next;
+};
+
+struct Seat *row_heads[ROWS];
+
+void create() {
+    int i, j;
+    struct Seat *temp, *newNode;
+    for (i = 0; i < ROWS; i++) {
+        temp = NULL;
+        for (j = 0; j < SEATS; j++) {
+            newNode = (struct Seat*)malloc(sizeof(struct Seat));
+            newNode->seat_num = j;
+            newNode->status = -1;
+            newNode->next = NULL;
+            newNode->prev = temp;
+            if (temp == NULL)
+                row_heads[i] = newNode;
+            else
+                temp->next = newNode;
+            temp = newNode;
+        }
+    }
+}
+
+void randomBook() {
+    int i, k, j, n, s;
+    struct Seat *temp;
+    srand(time(NULL));
+    for (i = 0; i < ROWS; i++) {
+        n = rand() % 4 + 1;
+        for (k = 0; k < n; k++) {
+            s = rand() % SEATS;
+            temp = row_heads[i];
+            for (j = 0; j < s; j++)
+                temp = temp->next;
+            temp->status = 1;
+        }
+    }
+}
+
+void display() {
+    int i;
+    struct Seat *temp;
+    printf("\nSeats (B = Booked, - = Empty):\n");
+    for (i = 0; i < ROWS; i++) {
+        printf("Row %d: ", i + 1);
+        temp = row_heads[i];
+        while (temp != NULL) {
+            if (temp->status == 1)
+                printf("B ");
+            else
+                printf("- ");
+            temp = temp->next;
+        }
+        printf("\n");
+    }
+}
+
+void changeSeat(int action) {
+    int row, seat;
+    struct Seat *temp;
+    printf("Enter row and seat: ");
+    scanf("%d %d", &row, &seat);
+    if (row < 1 || row > ROWS || seat < 1 || seat > SEATS) {
+        printf("Invalid input\n");
+        return;
+    }
+    temp = row_heads[row - 1];
+    while (temp->seat_num != seat - 1)
+        temp = temp->next;
+    if (action == 1) {
+        if (temp->status == -1) {
+            temp->status = 1;
+            printf("Seat booked\n");
+        }
+        else
+            printf("Already booked\n");
+    }
+    else {
+        if (temp->status == 1) {
+            temp->status = -1;
+            printf("Booking cancelled\n");
+        }
+        else
+            printf("Seat is empty\n");
+    }
+}
+
+void freeAll() {
+    int i;
+    struct Seat *temp, *next;
+    for (i = 0; i < ROWS; i++) {
+        temp = row_heads[i];
+        while (temp != NULL) {
+            next = temp->next;
+            free(temp);
+            temp = next;
+        }
+    }
+}
+
+int main() {
+    int choice;
+    create();
+    randomBook();
+    display();
+    while (1) {
+        printf("\n1. Display Seats\n2. Book Seat\n3. Cancel Booking\n4. Exit\n");
+        printf("Enter choice: ");
+        scanf("%d", &choice);
+        switch (choice) {
+            case 1: display(); break;
+            case 2: changeSeat(1); break;
+            case 3: changeSeat(0); break;
+            case 4: freeAll(); exit(0);
+            default: printf("Invalid choice\n");
+        }
+    }
+    return 0;
+}
