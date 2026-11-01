@@ -1,0 +1,185 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+struct node {
+    int prn;
+    char name[30];
+    struct node *next;
+};
+
+struct node* createNode() {
+    struct node *newNode = (struct node*)malloc(sizeof(struct node));
+    printf("Enter PRN and Name: ");
+    scanf("%d %29s", &newNode->prn, newNode->name);
+    newNode->next = NULL;
+    return newNode;
+}
+
+struct node* addPresident(struct node *head) {
+    struct node *newNode = createNode();
+    newNode->next = head;
+    return newNode;
+}
+
+struct node* addSecretary(struct node *head) {
+    struct node *newNode = createNode(), *temp = head;
+    if (head == NULL)
+        return newNode;
+    while (temp->next != NULL)
+        temp = temp->next;
+    temp->next = newNode;
+    return head;
+}
+
+struct node* addMember(struct node *head) {
+    struct node *newNode, *temp = head;
+    int pos, i;
+    if (head == NULL)
+        return addPresident(head);
+    printf("Enter position: ");
+    scanf("%d", &pos);
+    if (pos <= 1)
+        return addPresident(head);
+    for (i = 1; i < pos - 1 && temp->next != NULL; i++)
+        temp = temp->next;
+    newNode = createNode();
+    newNode->next = temp->next;
+    temp->next = newNode;
+    return head;
+}
+
+struct node* deletePresident(struct node *head) {
+    struct node *temp = head;
+    if (head == NULL)
+        return NULL;
+    head = head->next;
+    free(temp);
+    return head;
+}
+
+struct node* deleteSecretary(struct node *head) {
+    struct node *temp = head, *prev = NULL;
+    if (head == NULL || head->next == NULL) {
+        free(head);
+        return NULL;
+    }
+    while (temp->next != NULL) {
+        prev = temp;
+        temp = temp->next;
+    }
+    prev->next = NULL;
+    free(temp);
+    return head;
+}
+
+struct node* deleteMember(struct node *head) {
+    struct node *temp = head, *prev = NULL;
+    int pos, i;
+    if (head == NULL)
+        return NULL;
+    printf("Enter position: ");
+    scanf("%d", &pos);
+    if (pos <= 1)
+        return deletePresident(head);
+    for (i = 1; i < pos && temp != NULL; i++) {
+        prev = temp;
+        temp = temp->next;
+    }
+    if (temp == NULL) {
+        printf("Position out of bounds\n");
+        return head;
+    }
+    prev->next = temp->next;
+    free(temp);
+    return head;
+}
+
+int countMembers(struct node *head) {
+    int count = 0;
+    while (head != NULL) {
+        count++;
+        head = head->next;
+    }
+    return count;
+}
+
+void display(struct node *head) {
+    while (head != NULL) {
+        printf("PRN: %d\tName: %s\n", head->prn, head->name);
+        head = head->next;
+    }
+}
+
+struct node* concatenate(struct node *head1, struct node *head2) {
+    struct node *temp = head1;
+    if (head1 == NULL)
+        return head2;
+    while (temp->next != NULL)
+        temp = temp->next;
+    temp->next = head2;
+    return head1;
+}
+
+int main() {
+    struct node *head1 = NULL, *head2 = NULL;
+    int choice, division = 1;
+
+    do {
+        printf("\n1.Add President\n2.Add Member\n3.Add Secretary\n");
+        printf("4.Delete President\n5.Delete Member\n6.Delete Secretary\n");
+        printf("7.Count\n8.Display\n9.Concatenate\n10.Exit\n");
+        printf("Enter choice: ");
+        scanf("%d", &choice);
+
+        if (choice >= 1 && choice <= 8) {
+            printf("Enter Division (1 or 2): ");
+            scanf("%d", &division);
+        }
+
+        switch (choice) {
+            case 1:
+                if (division == 1) head1 = addPresident(head1);
+                else head2 = addPresident(head2);
+                break;
+            case 2:
+                if (division == 1) head1 = addMember(head1);
+                else head2 = addMember(head2);
+                break;
+            case 3:
+                if (division == 1) head1 = addSecretary(head1);
+                else head2 = addSecretary(head2);
+                break;
+            case 4:
+                if (division == 1) head1 = deletePresident(head1);
+                else head2 = deletePresident(head2);
+                break;
+            case 5:
+                if (division == 1) head1 = deleteMember(head1);
+                else head2 = deleteMember(head2);
+                break;
+            case 6:
+                if (division == 1) head1 = deleteSecretary(head1);
+                else head2 = deleteSecretary(head2);
+                break;
+            case 7:
+                if (division == 1) printf("Total = %d\n", countMembers(head1));
+                else printf("Total = %d\n", countMembers(head2));
+                break;
+            case 8:
+                if (division == 1) display(head1);
+                else display(head2);
+                break;
+            case 9:
+                head1 = concatenate(head1, head2);
+                head2 = NULL;
+                display(head1);
+                break;
+            case 10:
+                break;
+            default:
+                printf("Invalid choice\n");
+        }
+    } while (choice != 10);
+
+    return 0;
+}
