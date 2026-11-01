@@ -1,0 +1,130 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+#define MAX 50
+
+char cities[MAX][50];
+int graph[MAX][MAX];
+int visited[MAX];
+int n = 0;
+
+void DFS(int city)
+{
+    visited[city] = 1;
+    for (int i = 0; i < n; i++)
+    {
+        if (graph[city][i] != 0 && !visited[i])
+            DFS(i);
+    }
+}
+
+void addCity()
+{
+    if (n == MAX)
+    {
+        printf("City limit reached\n");
+        return;
+    }
+    printf("Enter city name: ");
+    scanf(" %49[^\n]", cities[n]);
+    n++;
+}
+
+void addFlight()
+{
+    int src, dest, cost, c;
+
+    for (int i = 0; i < n; i++)
+        printf("%d = %s\n", i, cities[i]);
+
+    printf("Enter source, destination and cost (like 0 1 5): ");
+    if (scanf("%d %d %d", &src, &dest, &cost) != 3)
+    {
+        while ((c = getchar()) != '\n' && c != EOF);
+        printf("Enter only numbers\n");
+        return;
+    }
+
+    if (src < 0 || src >= n || dest < 0 || dest >= n || src == dest)
+    {
+        printf("Invalid city index\n");
+        return;
+    }
+    graph[src][dest] = cost;
+    graph[dest][src] = cost;
+}
+
+void displayGraph()
+{
+    printf("\nAdjacency Matrix:\n\t");
+    for (int i = 0; i < n; i++)
+        printf("%s\t", cities[i]);
+    printf("\n");
+
+    for (int i = 0; i < n; i++)
+    {
+        printf("%s\t", cities[i]);
+        for (int j = 0; j < n; j++)
+            printf("%d\t", graph[i][j]);
+        printf("\n");
+    }
+}
+
+int isConnected()
+{
+    for (int i = 0; i < n; i++)
+        visited[i] = 0;
+
+    DFS(0);
+
+    for (int i = 0; i < n; i++)
+    {
+        if (visited[i] == 0)
+            return 0;
+    }
+    return 1;
+}
+
+int main()
+{
+    int choice, c;
+
+    while (1)
+    {
+        printf("\n1. Add City\n2. Add Flight\n3. Display Graph\n4. Check Connected\n5. Exit\n");
+        printf("Enter choice: ");
+
+        if (scanf("%d", &choice) != 1)
+        {
+            while ((c = getchar()) != '\n' && c != EOF);
+            printf("Invalid choice\n");
+            continue;
+        }
+
+        switch (choice)
+        {
+            case 1:
+                addCity();
+                break;
+            case 2:
+                addFlight();
+                break;
+            case 3:
+                displayGraph();
+                break;
+            case 4:
+                if (n == 0)
+                    printf("No cities yet\n");
+                else if (isConnected())
+                    printf("Graph is CONNECTED\n");
+                else
+                    printf("Graph is NOT CONNECTED\n");
+                break;
+            case 5:
+                exit(0);
+            default:
+                printf("Invalid choice\n");
+        }
+    }
+    return 0;
+}
