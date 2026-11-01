@@ -1,0 +1,213 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+struct Node 
+{
+    int data;
+    struct Node *left;
+    struct Node *right;
+};
+
+// Ready Functions
+struct Node* createNode(int value) 
+{
+    struct Node* temp = (struct Node*)malloc(sizeof(struct Node));
+    temp->data = value;
+    temp->left = NULL;//left right pointers ko null set 
+    temp->right = NULL;
+    return temp;
+}
+//Comparison wala logic
+struct Node* insert(struct Node* root, int value) 
+{
+    if (root == NULL) 
+    {
+        return createNode(value);
+    }
+    if (value < root->data)
+    {
+        root->left = insert(root->left, value);
+    } else if (value > root->data) 
+    {
+        root->right = insert(root->right, value);
+    }
+    return root;
+}
+
+void inorder(struct Node* root) 
+{
+    if (root != NULL)
+    {
+        inorder(root->left);
+        printf("%d ", root->data);
+        inorder(root->right);
+    }
+}
+
+void preorder(struct Node* root)
+{
+    if (root != NULL) 
+    {
+        printf("%d ", root->data);
+        preorder(root->left);
+        preorder(root->right);
+    }
+}
+
+void postorder(struct Node* root)
+{
+    if (root != NULL)
+    {
+        postorder(root->left);
+        postorder(root->right);
+        printf("%d ", root->data);
+    }
+}
+
+int findMin(struct Node* root)
+{
+  if(root==NULL)    
+  return -1;
+  struct Node* current = root;
+  while(current->left!=NULL)
+  {
+      current=current->left;
+  }
+  return current->data;
+  }
+
+int findheight(struct Node* root)
+{
+    if(root==NULL)
+    {
+    return -1;
+    }
+    int leftH= findheight(root->left);
+    int rightH= findheight(root->right);
+    if(rightH>leftH)
+    {
+     return rightH+1;
+    }
+    else
+    {
+    return leftH+1;
+    }
+}
+
+void mirrortree(struct Node* root)
+{
+    if(root==NULL)
+    return;
+    struct Node* temp=root->left;
+    root->left=root->right;
+    root->right=temp;
+    mirrortree(root->left);
+    mirrortree(root->right);
+}
+
+int search(struct Node* root, int key)
+{
+    if(root==NULL)
+    {
+    return 0;
+    }
+    if(root->data==key)
+    {
+    return 1;
+    }
+    if(key<root->data)
+    {
+    return search(root->left,key);
+    }
+    else 
+    {
+     return search(root->right,key);
+    }
+}
+
+int main() 
+{
+    struct Node* root = NULL;
+    int choice, val;
+
+    while (1) 
+    {
+        printf("\n    BST Menu    \n");
+        printf("1. Insert Value\n");
+        printf("2. Display Traversals (Inorder, Preorder, Postorder)\n");
+        printf("3. Find Minimum Value\n");
+        printf("4. Find Height / Longest Path\n");
+        printf("5. Mirror Tree\n");
+        printf("6. Search Value\n");
+        printf("7. Exit\n");
+        printf("Enter choice: ");
+        scanf("%d", &choice);
+
+        switch (choice)
+        {
+            case 1:
+                printf("Enter value: ");
+                scanf("%d", &val);
+                root = insert(root, val);
+                break;
+
+            case 2:
+                if (root != NULL) 
+                {
+                    printf("Inorder  : ");
+                    inorder(root);
+                    printf("\nPreorder : ");
+                    preorder(root);
+                    printf("\nPostorder: ");
+                    postorder(root);
+                    printf("\n");
+                } 
+                else 
+                {
+                    printf("Tree is empty!\n");
+                }
+                break;
+
+            case 3:
+                if (root != NULL) 
+                {
+                    printf("Minimum value in BST: %d\n", findMin(root));
+                }
+                else 
+                {
+                    printf("Tree is empty!\n");
+                }
+                break;
+
+            case 4:
+                printf("Number of nodes in longest path (Height): %d\n", findheight(root));
+                break;
+
+            case 5:
+                mirrortree(root);
+                printf("Tree mirrored successfully.\n");
+                break;
+
+            case 6:
+                printf("Enter key to search: ");
+                scanf("%d", &val);
+                if (search(root, val))
+                {
+                    printf("Key found\n");
+                }
+                else
+                {
+                    printf("Key not found\n");
+                }
+                break;
+
+            case 7:
+                printf("Exiting...\n");
+                return 0;
+
+            default:
+                printf("Invalid choice!\n");
+        }
+    }
+    return 0;
+}
