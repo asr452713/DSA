@@ -1,0 +1,171 @@
+#include <stdio.h>
+#include <ctype.h>
+#include <string.h>
+
+char stack[100];
+int top = -1;
+
+void push(char c) {
+    stack[++top] = c;
+}
+
+char pop() {
+    return stack[top--];
+}
+
+int empty() {
+    return (top == -1);
+}
+
+int isOperator(char x) {
+    if (x == '+' || x == '-' || x == '*' || x == '/' || x == '^')
+    {
+        return 1;
+        
+    }
+        else{
+    return 0;
+        }
+}
+
+int isOperand(char x) {
+    if (isalpha(x) || isdigit(x))
+    {
+       return 1;
+    
+}
+        else
+        {
+    return 0;
+        }
+}
+
+int precedence(char x) {
+    switch (x) {
+        case '+': case '-': return 2;
+        case '*': case '/': return 3;
+        case '^': return 4;
+    }
+    return 0;
+}
+
+void Infix_to_Postfix(char str[], char postfix[]) 
+{
+    int len = strlen(str);
+    int j = 0;
+    top = -1;
+    for (int i = 0; i < len; i++) {
+        if (isOperand(str[i])) {
+            postfix[j++] = str[i];
+        }
+        else if (str[i] == '(') {
+            push(str[i]);
+        }
+        else if (str[i] == ')') {
+            while (!empty() && stack[top] != '(') {
+                postfix[j++] = pop();
+            }
+            if (!empty())
+                pop();
+        }
+        else if (isOperator(str[i])) {
+            while (!empty() && stack[top] != '(' && precedence(stack[top]) >= precedence(str[i])) {
+                postfix[j++] = pop();
+            }
+            push(str[i]);
+        }
+    }
+    while (!empty()) {
+        postfix[j++] = pop();
+    }
+    postfix[j] = '\0';
+}
+
+int evaluate(char postfix[]) {
+    int st[100];
+    int t = -1;
+    int a, b, r;
+    for (int i = 0; postfix[i] != '\0'; i++) {
+        char ch = postfix[i];
+        if (isdigit(ch)) {
+            st[++t] = ch - '0';
+        }
+        else {
+            b = st[t--];
+            a = st[t--];
+            switch (ch) {
+                case '+': r = a + b; break;
+                case '-': r = a - b; break;
+                case '*': r = a * b; break;
+                case '/': r = a / b; break;
+                case '^':
+                    r = 1;
+                    for (int k = 0; k < b; k++)
+                           {
+                               r = r * a;
+                           }
+                            break;
+            }
+            st[++t] = r;
+        }
+    }
+    return st[t];
+}
+
+int main() {
+    char s[100], postfix[100];
+    int choice, c;
+    int saved = 0, converted = 0;
+
+    while (1) 
+    {
+        printf("\n1. Enter Infix Expression");
+        printf("\n2. Convert to Postfix");
+        printf("\n3. Evaluate Postfix");
+        printf("\n4. Exit");
+        printf("\nEnter choice: ");
+
+        if (scanf("%d", &choice) != 1) 
+        {
+            while ((c = getchar()) != '\n' && c != EOF)
+            {
+            printf("Invalid choice!\n");
+            continue;
+            }
+        }
+        switch (choice) {
+            case 1:
+                printf("Enter Infix Expression: ");
+                scanf("%s", s);
+                saved = 1;
+                converted = 0;
+                break;
+            case 2:
+                if (saved==0)
+                {
+                    printf("Enter infix expression first!\n");
+                    break;
+                }
+                Infix_to_Postfix(s, postfix);
+                converted = 1;
+                printf("Infix: %s\n", s);
+                printf("Postfix: %s\n", postfix);
+                break;
+            case 3:
+                if (converted==0)
+                {
+                    printf("Convert to postfix first!\n");
+                    break;
+                }
+                printf("Postfix: %s\n", postfix);
+                printf("Result = %d\n", evaluate(postfix));
+                break;
+            case 4:
+                printf("Exiting... Thank You!\n");
+                return 0;
+            default:
+                printf("Invalid choice!\n");
+        }
+    }
+    return 0;
+}
