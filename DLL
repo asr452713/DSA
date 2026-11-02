@@ -1,6 +1,5 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <time.h>
 
 #define ROWS 10
 #define SEATS 7
@@ -37,7 +36,6 @@ void create() {
 void randomBook() {
     int i, k, j, n, s;
     struct Seat *temp;
-    srand(time(NULL));
     for (i = 0; i < ROWS; i++) {
         n = rand() % 4 + 1;
         for (k = 0; k < n; k++) {
